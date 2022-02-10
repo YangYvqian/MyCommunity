@@ -19,9 +19,8 @@ import java.util.UUID;
 @Controller
 public class AuthorizeController {
 
-    @Autowired
     private GitHubProvider gitHubProvider;
-
+    private UserMapper userMapper;
 //  从配置文件中加载值-----方便统一管理
     @Value("${github.client.id}")
     private String clientId;
@@ -32,8 +31,16 @@ public class AuthorizeController {
     @Value("${github.Redirect.uri}")
     private String RedirectUri;
 
+
     @Autowired
-    private UserMapper userMapper;
+    public void setUserMapper(UserMapper userMapper) {
+        this.userMapper = userMapper;
+    }
+
+    @Autowired
+    public void setGitHubProvider(GitHubProvider gitHubProvider) {
+        this.gitHubProvider = gitHubProvider;
+    }
 
     @GetMapping("/callback")
     public String callback(@RequestParam(name = "code") String code,
@@ -64,15 +71,20 @@ public class AuthorizeController {
             user.setAccountId(String.valueOf(githubUser.getId()));
             user.setGmtCreate(System.currentTimeMillis());
             user.setGmtModified(user.getGmtCreate());
+            user.setAvatarUrl(githubUser.getAvatarUrl());
 //            向数据库中插入信息，相当于写入session，
+//            if (user.getName() == null){
+//                return "redirect:/";
+//            }
             userMapper.insert(user);
-
-//          登录成功，把token写入cookie中，cookie在response中
+            //          登录成功，把token写入cookie中，cookie在response中
             response.addCookie(new Cookie("token", token));
 
-//          把信息写到session中
-//            request.getSession().setAttribute("user", githubUser);
+
             return "redirect:/";
+
+
+
         }else {
             return "/";
         }

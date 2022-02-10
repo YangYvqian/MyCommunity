@@ -1,9 +1,9 @@
 package com.yyq.mycommunity.model;
 
 import lombok.Data;
-import lombok.ToString;
 
-@ToString
+
+
 @Data
 public class User {
     private Integer id;
@@ -12,4 +12,5 @@ public class User {
     private String token;
     private Long gmtCreate;
     private Long gmtModified;
+    private String avatarUrl;
 }

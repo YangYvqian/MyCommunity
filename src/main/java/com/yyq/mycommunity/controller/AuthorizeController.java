@@ -63,7 +63,7 @@ public class AuthorizeController {
             user.setName(githubUser.getName());
             user.setAccountId(String.valueOf(githubUser.getId()));
             user.setGmtCreate(System.currentTimeMillis());
-            user.setGmtModified(user.getGmtModified());
+            user.setGmtModified(user.getGmtCreate());
 //            向数据库中插入信息，相当于写入session，
             userMapper.insert(user);
 

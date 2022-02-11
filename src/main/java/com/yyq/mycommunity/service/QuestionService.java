@@ -25,28 +25,35 @@ import java.util.List;
  **/
 @Service
 public class QuestionService {
+    @Autowired
     private QuestionMapper questionMapper;
     private UserMapper userMapper;
 
-    @Autowired
-    public void setQuestionMapper(QuestionMapper questionMapper) {
-        this.questionMapper = questionMapper;
-    }
+//    @Autowired
+//    public void setQuestionMapper(QuestionMapper questionMapper) {
+//        this.questionMapper = questionMapper;
+//    }
 
     @Autowired
     public void setUserMapper(UserMapper userMapper) {
         this.userMapper = userMapper;
     }
+
+    /****************************************************************************/
 //  分页列表展示，从Controller层接收两个page size参数，对分页进行处理
 //    返回的数据是封装了QuestionDTO 和 页信息 的数据
     public PaginationDTO list(Integer page, Integer size) {
 
-
         PaginationDTO paginationDTO = new PaginationDTO();
         // 获取question表中问题的总数
         Integer totalCount = questionMapper.count();
-        // 把totalCount, page, size 传到paginationDTO，进行页信息计算
-        paginationDTO.setPagination(totalCount, page, size);
+        Integer totalPage;
+        if (totalCount % size == 0){
+            totalPage = totalCount / size;
+        }else{
+            totalPage = (totalCount / size) + 1;
+        }
+
 
         // 此代码有两处判断页码越界的问题
         //有两处判断的原因是有两个地方需要做越界处理
@@ -55,8 +62,10 @@ public class QuestionService {
         //当前是1的情况
         // 能不能只出现一次判断越界呢？
         if (page<1) page=1;
-        if (page > paginationDTO.getTotalPage()) page = paginationDTO.getTotalPage();
+        if (page > totalPage) page = totalPage;
 
+        // 把totalCount, page, size 传到paginationDTO，进行页信息计算
+        paginationDTO.setPagination(totalPage, page);
         // 计算页面偏移量，也就是算出每页从第几条开始
         Integer offset = size * (page - 1);
         // 获取问题列表
@@ -64,10 +73,9 @@ public class QuestionService {
         // select * from question limit offset size
         List<Question> questions = questionMapper.list(offset,size);
 
+
 //        把问题和用户添加到questionDTOList列表中，进行组合
         List<QuestionDTO> questionDTOList = new ArrayList<>();
-
-
 
         for (Question question : questions) {
             User user= userMapper.findById(question.getCreator());
@@ -77,13 +85,58 @@ public class QuestionService {
             questionDTOList.add(questionDTO);
         }
 
-
-
 //        把封装了Question 和 User的questionDTO，传给paginationDTO的questions
         paginationDTO.setQuestions(questionDTOList);
 
+        return paginationDTO;
+    }
+
+    /****************************************************************************/
+    public PaginationDTO list(Integer userId,Integer page, Integer size) {
+
+        PaginationDTO paginationDTO = new PaginationDTO();
+        // 获取question表中问题的总数
+        Integer totalCount = questionMapper.countByUserId(userId);
+        Integer totalPage;
+        if (totalCount % size == 0){
+            totalPage = totalCount / size;
+        }else{
+            totalPage = (totalCount / size) + 1;
+        }
 
 
+        // 此代码有两处判断页码越界的问题
+        //有两处判断的原因是有两个地方需要做越界处理
+        // 1.数据库查询时，page是否越界
+        // 2.前端页面展示的时候，page页表中不能显示越界信息
+        //当前是1的情况
+        // 能不能只出现一次判断越界呢？
+        if (page<1) page=1;
+        if (page > totalPage) page = totalPage;
+
+        // 把totalCount, page, size 传到paginationDTO，进行页信息计算
+        paginationDTO.setPagination(totalPage, page);
+
+        // 计算页面偏移量，也就是算出每页从第几条开始
+        Integer offset = size * (page - 1);
+        // 获取问题列表
+        // 传递给查询question表的select语句的limit的两个参数，
+        // select * from question limit offset size
+        List<Question> questions = questionMapper.listByUserId(userId, offset, size);
+
+//        把问题和用户添加到questionDTOList列表中，进行组合
+        List<QuestionDTO> questionDTOList = new ArrayList<>();
+
+        for (Question question : questions) {
+            User user= userMapper.findById(question.getCreator());
+            QuestionDTO questionDTO = new QuestionDTO();
+            BeanUtils.copyProperties(question,questionDTO);
+            questionDTO.setUser(user);
+            questionDTOList.add(questionDTO);
+        }
+
+//        把封装了Question 和 User的questionDTO，传给paginationDTO的questions
+        paginationDTO.setQuestions(questionDTOList);
         return paginationDTO;
     }
 }

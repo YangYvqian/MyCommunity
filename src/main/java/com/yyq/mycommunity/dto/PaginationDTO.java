@@ -26,7 +26,7 @@ public class PaginationDTO {
     private List<Integer> pages = new ArrayList<>();  //展示的列表页
     private Integer totalPage;    // 总页数
 
-    public void setPagination(Integer totalCount, Integer page, Integer size) {
+    public void setPagination(Integer totalPage, Integer page) {
 
 
         /*
@@ -44,16 +44,13 @@ public class PaginationDTO {
 
         // 计算总页数  totalCount / size
 //        Integer totalPage = 0;
-         if (totalCount % size == 0){
-             totalPage = totalCount / size;
-         }else{
-             totalPage = (totalCount / size) + 1;
-         }
-        // 页码越界处理问题
-        if (page<1) page=1;
-        if (page > totalPage) page = totalPage;
+
+//        // 页码越界处理问题
+//        if (page<1) page=1;
+//        if (page > totalPage) page = totalPage;
 
         this.page = page;
+        this.totalPage = totalPage;
         // 获取当前页的页列表
         pages.add(page);
         for (int i = 1; i <= 3; i++) {

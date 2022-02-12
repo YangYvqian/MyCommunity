@@ -26,10 +26,10 @@ public class ProfileController {
     public String index(@PathVariable(name = "action")  String action,
                         Model model,
                         @RequestParam(name = "page",defaultValue = "1") Integer page,
-                        @RequestParam(name = "size", defaultValue = "2") Integer size,
+                        @RequestParam(name = "size", defaultValue = "8") Integer size,
                         HttpServletRequest request){
 
-        // 获取用户信息,从request中拿
+        // 获取用户信息,从request中的session拿
         User user =(User)request.getSession().getAttribute("user");
         if (user == null){
             return "redirect:/";
@@ -39,6 +39,7 @@ public class ProfileController {
             model.addAttribute("section", "questions");
             model.addAttribute("sectionName", "我的提问");
             PaginationDTO pagination = questionService.list(user.getId(),page, size);
+
             model.addAttribute("pagination",pagination);
         }else if ("replies".equals(action)){
             model.addAttribute("section", "replies");

@@ -1,44 +1,49 @@
 package com.yyq.mycommunity.controller;
 
+import com.yyq.mycommunity.dto.QuestionDTO;
 import com.yyq.mycommunity.mapper.QuestionMapper;
-import com.yyq.mycommunity.mapper.UserMapper;
 import com.yyq.mycommunity.model.Question;
 import com.yyq.mycommunity.model.User;
+import com.yyq.mycommunity.service.QuestionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
 public class PublishController {
 
-
-    private UserMapper userMapper;
     private QuestionMapper questionMapper;
+    private QuestionService questionService;
+
+    @Autowired
+    public void setQuestionService(QuestionService questionService) {
+        this.questionService = questionService;
+    }
 
     @Autowired
     public void setQuestionMapper(QuestionMapper questionMapper) {
         this.questionMapper = questionMapper;
     }
-    @Autowired
-    public void setUserMapper(UserMapper userMapper) {
-        this.userMapper = userMapper;
-    }
+
 
     @GetMapping("/publish")
     public String publish(){
         return "publish";
 
     }
+
+//    创建一个想发表的问题，并插入数据库
     @PostMapping("/publish")
     public String doPublish(@RequestParam("title") String title,
                             @RequestParam("description") String description,
                             @RequestParam("tag") String tag,
+                            @RequestParam(value = "id",required = false) Integer id,
                             HttpServletRequest request,
                             Model model){
         model.addAttribute("title", title);
@@ -58,24 +63,8 @@ public class PublishController {
             return "publish";
         }
 
-
-
-
-//        获取用户信息
-        User user = null;
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null && cookies.length !=0)
-            for (Cookie cookie : cookies){
-                if (cookie.getName().equals("token")){
-                    String token = cookie.getValue();
-                    user = userMapper.findByToken(token);
-                    if (user != null){
-                        request.getSession().setAttribute("user", user);
-                    }
-                    break;
-                }
-            }
-
+        // 获取用户信息,从request中的session拿
+        User user =(User)request.getSession().getAttribute("user");
         if (user == null){
             model.addAttribute("error", "用户未登录");
             return "publish";
@@ -86,10 +75,20 @@ public class PublishController {
         question.setDescription(description);
         question.setTag(tag);
         question.setCreator(user.getId());
-        question.setGmtCreate(System.currentTimeMillis());
-        question.setGmtModified(question.getGmtCreate());
 
-        questionMapper.creation(question);
+        question.setId(id);
+        questionService.createOrUpdate(question);
         return "redirect:/";
+    }
+
+    @GetMapping("/publish/{id}")
+    public String editPublish(@PathVariable(name = "id") Integer id,
+                              Model model){
+        QuestionDTO question = questionService.getById(id);
+        model.addAttribute("title", question.getTitle());
+        model.addAttribute("description", question.getDescription());
+        model.addAttribute("tag", question.getTag());
+        model.addAttribute("id",question.getId());
+        return "publish";
     }
 }

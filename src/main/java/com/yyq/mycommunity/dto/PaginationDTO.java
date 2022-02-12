@@ -42,15 +42,16 @@ public class PaginationDTO {
 
 
 
-        // 计算总页数  totalCount / size
-//        Integer totalPage = 0;
-
-//        // 页码越界处理问题
-//        if (page<1) page=1;
-//        if (page > totalPage) page = totalPage;
-
         this.page = page;
         this.totalPage = totalPage;
+
+//        // 页码越界处理问题
+        if (page > totalPage) page = totalPage;
+        if (page<1) page=1;
+
+
+//        this.page = page;
+//        this.totalPage = totalPage;
         // 获取当前页的页列表
         pages.add(page);
         for (int i = 1; i <= 3; i++) {

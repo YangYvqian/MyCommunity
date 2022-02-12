@@ -49,11 +49,16 @@
                         <ul class="dropdown-menu">
                             <li><a href="/profile/questions">我的问题</a></li>
                             <li><a href="#">个人资料</a></li>
-                            <li><a href="#">退出</a></li>
+                            <li><a href="/logout">退出</a></li>
                         </ul>
-                    <li th:if="${session.user == null}">
-                        <a href="https://github.com/login/oauth/authorize?client_id=01f0c614ca896e982996&redirect_uri=http://localhost:8080/callback&scope=user&state=1">登录</a></li>
-                    </li>
+                        <li th:if="${session.user == null}">
+                            <a href="https://github.com/login/oauth/authorize?client_id=01f0c614ca896e982996&redirect_uri=http://localhost:8080/callback&scope=user&state=1">Github登录</a>
+                            <a href="https://gitee.com/oauth/authorize?client_id=e8be89239a8f9fed85fdd4f9e45b7c1d307e2798a34f2dcb70e9f2a98c42cc5d&redirect_uri=http://localhost:8080/callback&response_type=code&state=1">Gitee登录</a>
+                        </li>
+
+
+
+
                 </ul>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->

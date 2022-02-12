@@ -61,8 +61,9 @@ public class QuestionService {
         // 2.前端页面展示的时候，page页表中不能显示越界信息
         //当前是1的情况
         // 能不能只出现一次判断越界呢？
-        if (page<1) page=1;
         if (page > totalPage) page = totalPage;
+        if (page<1) page=1;
+
 
         // 把totalCount, page, size 传到paginationDTO，进行页信息计算
         paginationDTO.setPagination(totalPage, page);
@@ -92,7 +93,8 @@ public class QuestionService {
     }
 
     /****************************************************************************/
-    public PaginationDTO list(Integer userId,Integer page, Integer size) {
+    public PaginationDTO list(Integer userId,Integer cpage, Integer size) {
+
 
         PaginationDTO paginationDTO = new PaginationDTO();
         // 获取question表中问题的总数
@@ -111,14 +113,18 @@ public class QuestionService {
         // 2.前端页面展示的时候，page页表中不能显示越界信息
         //当前是1的情况
         // 能不能只出现一次判断越界呢？
-        if (page<1) page=1;
-        if (page > totalPage) page = totalPage;
+
+
+        if (cpage > totalPage) cpage = totalPage;
+        if (cpage < 1) {
+            cpage = 1;
+        }
 
         // 把totalCount, page, size 传到paginationDTO，进行页信息计算
-        paginationDTO.setPagination(totalPage, page);
+        paginationDTO.setPagination(totalPage, cpage);
 
         // 计算页面偏移量，也就是算出每页从第几条开始
-        Integer offset = size * (page - 1);
+        Integer offset = size * (cpage - 1);
         // 获取问题列表
         // 传递给查询question表的select语句的limit的两个参数，
         // select * from question limit offset size
@@ -138,5 +144,26 @@ public class QuestionService {
 //        把封装了Question 和 User的questionDTO，传给paginationDTO的questions
         paginationDTO.setQuestions(questionDTOList);
         return paginationDTO;
+    }
+
+    public QuestionDTO getById(Integer questionId) {
+        Question question =  questionMapper.getQuestionByQuestionId(questionId);
+        QuestionDTO questionDTO = new QuestionDTO();
+        BeanUtils.copyProperties(question,questionDTO);
+        User user= userMapper.findById(question.getCreator());
+        questionDTO.setUser(user);
+        return questionDTO;
+
+    }
+
+    public void createOrUpdate(Question question) {
+        if (question.getId() == null){
+            question.setGmtCreate(System.currentTimeMillis());
+            question.setGmtModified(question.getGmtCreate());
+            questionMapper.creation(question);
+        }else {
+            question.setGmtModified(System.currentTimeMillis());
+            questionMapper.updateQuestion(question);
+        }
     }
 }

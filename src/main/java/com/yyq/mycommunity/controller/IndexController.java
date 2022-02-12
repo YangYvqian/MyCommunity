@@ -19,13 +19,13 @@ import java.util.List;
 public class IndexController {
 
 
-    private UserMapper userMapper;
+//    private UserMapper userMapper;
     private QuestionService questionService;
 
-    @Autowired
-    public void setUserMapper(UserMapper userMapper) {
-        this.userMapper = userMapper;
-    }
+//    @Autowired
+//    public void setUserMapper(UserMapper userMapper) {
+//        this.userMapper = userMapper;
+//    }
     @Autowired
     public void setQuestionService(QuestionService questionService) {
         this.questionService = questionService;
@@ -36,22 +36,22 @@ public class IndexController {
     public String index(HttpServletRequest request,
                         Model model,
                         @RequestParam(name = "page", defaultValue = "1") Integer page,  // 从前端页面传当前点击的页码
-                        @RequestParam(name = "size", defaultValue = "1") Integer size){  //设置每页展示多少size
-        Cookie[] cookies = request.getCookies();
-        if (cookies != null && cookies.length != 0)
-            for (Cookie cookie : cookies){
-                if (cookie.getName().equals("token")){
-                    String token = cookie.getValue();
-                    User user = userMapper.findByToken(token);
-    //                如果user不为null的时候，把user信息写到session中，让页面展示
-    //                访问首页的时候，循环去看所有的cookie，找到cookie等于token的cookie，
-    //                拿到这个cookie去数据库中查，是不是数据库中有这条记录，如果有，把这个user信息放到session里
-                    if (user != null){
-                        request.getSession().setAttribute("user", user);
-                    }
-                    break;
-                }
-            }
+                        @RequestParam(name = "size", defaultValue = "8") Integer size){  //设置每页展示多少size
+//        Cookie[] cookies = request.getCookies();
+//        if (cookies != null && cookies.length != 0)
+//            for (Cookie cookie : cookies){
+//                if (cookie.getName().equals("token")){
+//                    String token = cookie.getValue();
+//                    User user = userMapper.findByToken(token);
+//    //                如果user不为null的时候，把user信息写到session中，让页面展示
+//    //                访问首页的时候，循环去看所有的cookie，找到cookie等于token的cookie，
+//    //                拿到这个cookie去数据库中查，是不是数据库中有这条记录，如果有，把这个user信息放到session里
+//                    if (user != null){
+//                        request.getSession().setAttribute("user", user);
+//                    }
+//                    break;
+//                }
+//            }
         // page size 传给service层做分页处理
 //        获取到的数据是封装了QuestionDTO 和 页信息 的数据
 //        并把信息列表和页信息传给前端

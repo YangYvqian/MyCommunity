@@ -1,0 +1,55 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title th:text="${question.title}"></title>
+    <head th:insert="~{import :: head}"></head>
+</head>
+<body>
+<div th:insert="~{navigation :: nav}"></div>
+<div class="container-fluid main profile">
+    <div class="row">
+        <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
+            <h3 th:text="${question.title}"></span></h3>
+            <span class="text-desc">
+                作者：<span th:text="${question.user.name}"></span>&nbsp;&nbsp; |&nbsp;
+                发布时间：<span th:text="${#dates.format(question.gmtCreate,'yyyy-MM-dd HH:mm')}"></span>&nbsp;&nbsp; |&nbsp;
+                阅读量：<span th:text="${question.viewCount}"></span>
+            </span>
+            <hr>
+            <span class="media-heading" th:text="${question.description}"></span>
+            <hr>
+            <a th:href="@{'/publish/'+${question.id}}" class="community-menu" th:if="${session.user != null && session.user.id == question.creator}">
+                <span class="glyphicon glyphicon-pencil"></span>
+                <span>编辑</span>
+
+            </a>
+
+        </div><!-- /.col-lg-9 -->
+
+        <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12 section">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <h3>发起人</h3>
+            </div>
+            <div class="media col-lg-12 col-md-12 col-sm-12 col-xs-12" >
+                <div class="media-left ">
+                    <a href="#">
+                        <img class="media-object img-circle" th:src="${question.user.avatarUrl}" alt="用户头像">
+                    </a>
+                </div>
+                <div class="media-body">
+                    <h4 class="media-heading" th:text="${question.user.name}"></h4>
+                    <br>
+                </div>
+            </div>
+            <hr class="media col-lg-12 col-md-12 col-sm-12 col-xs-12">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                <h3>相关问题</h3>
+
+            </div>
+
+        </div><!-- /.col-lg-3 -->
+    </div><!-- /.row -->
+
+</div><!-- /.container-fluid -->
+</body>
+</html>
